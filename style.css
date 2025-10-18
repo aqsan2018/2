@@ -1,0 +1,121 @@
+/* General Setup */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cursive', 'Palatino', serif;
+    background-color: #000010;
+    overflow: hidden;
+    color: white;
+}
+
+#universe-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+}
+
+/* Star Styling */
+.star {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+    box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
+    animation: glow 1.5s infinite alternate ease-in-out;
+    transition: transform 2.5s ease-in-out, opacity 1s ease;
+    z-index: 10;
+}
+
+.star.clicked {
+    opacity: 0.5;
+    box-shadow: 0 0 10px #fff, 0 0 20px #a9a9a9;
+    animation: none; /* Stop glowing when clicked */
+}
+
+.secret-star {
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 10px #f0f, 0 0 20px #f0f;
+    animation-delay: 0.5s;
+}
+
+@keyframes glow {
+    from {
+        transform: scale(1);
+        box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
+    }
+    to {
+        transform: scale(1.5);
+        box-shadow: 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff, 0 0 50px #0ff;
+    }
+}
+
+/* Text Styling */
+#intro-message, #final-message {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5em;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 5;
+    transition: opacity 2s ease;
+    text-align: center;
+}
+
+#final-message {
+    top: 50%;
+    font-size: 2.5em;
+    color: #fff;
+    text-shadow: 0 0 10px #fff, 0 0 20px #ffc0cb;
+}
+
+/* Modal (Pop-up) Styling */
+#modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+#modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0 0 30px #ffc0cb;
+}
+
+#modal-image {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: 5px;
+}
+
+#modal-caption {
+    color: #333;
+    font-size: 1.2em;
+    margin-top: 15px;
+}
+
+/* Utility Classes */
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
