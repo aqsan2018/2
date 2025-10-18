@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Video Background -->
+    <video autoplay muted loop id="background-video">
+        <source src="background-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <div id="universe-container">
-        </div>
+        <!-- Stars will be dynamically created here by script.js -->
+    </div>
 
     <div id="intro-message">
         Every star has a story. Click one to see.
@@ -18,14 +25,17 @@
         Every star I’ve ever wished on led to you.
     </div>
 
+    <!-- This is the pop-up modal for the photos -->
     <div id="modal" class="hidden">
         <div id="modal-content">
+            <span class="close-button">&times;</span>
             <img id="modal-image" src="" alt="Memory">
             <p id="modal-caption"></p>
         </div>
     </div>
 
-    <audio id="final-music" src="music.mp3" preload="auto"></audio>
+    <!-- Audio file for the final animation -->
+    <audio id="final-music" src="music.mp3" preload="auto" loop></audio>
 
     <script src="script.js"></script>
 </body>
