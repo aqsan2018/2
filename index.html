@@ -11,27 +11,11 @@
             margin: 0;
             padding: 0;
             font-family: 'Cursive', 'Palatino', serif;
+            /* Simple, reliable CSS galaxy background */
             background-color: #000;
+            background-image: radial-gradient(ellipse at center, #1b2735 0%, #090a0f 100%);
             overflow: hidden;
             color: white;
-        }
-
-        /* Animated CSS Galaxy Background */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: 
-                radial-gradient(ellipse at center, rgba(30, 45, 60, 0.8) 0%, rgba(9, 10, 15, 0.9) 70%, #000 100%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><style type="text/css"><![CDATA[circle{fill:white;animation:sparkle 2s linear infinite alternate;}@keyframes sparkle{0%{opacity:0;}100%{opacity:0.3;}}]]></style></defs><circle cx="10" cy="10" r="0.5"/><circle cx="50" cy="30" r="0.5"/><circle cx="80" cy="70" r="0.5"/><circle cx="30" cy="90" r="0.5"/><circle cx="90" cy="20" r="0.5"/></svg>');
-            animation: move-galaxy 60s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes move-galaxy {
-            from { background-position: 0 0; }
-            to { background-position: 1000px 1000px; }
         }
 
         #universe-container, #filler-stars-container {
@@ -44,6 +28,7 @@
         }
         #universe-container {
             pointer-events: auto; 
+            z-index: 10;
         }
 
         /* Main Interactive Star Styling */
@@ -58,7 +43,6 @@
             animation: twinkle 2s infinite alternate ease-in-out;
             transition: transform 2.5s ease-in-out, opacity 1s ease, box-shadow 0.3s ease, left 2.5s ease-in-out, top 2.5s ease-in-out,
                         width 0.3s ease, height 0.3s ease;
-            z-index: 10;
         }
 
         /* Filler Star Styling */
@@ -177,30 +161,48 @@
             let clickedStarCount = 0;
             const totalStars = 5;
 
+            // Coordinates are in percentages {x, y}
             const heartCoords = [
                 {x: 50, y: 35}, {x: 55, y: 30}, {x: 63, y: 30}, {x: 70, y: 35}, {x: 75, y: 42}, 
                 {x: 75, y: 50}, {x: 70, y: 60}, {x: 60, y: 70}, {x: 50, y: 80}, {x: 40, y: 70}, 
                 {x: 30, y: 60}, {x: 25, y: 50}, {x: 25, y: 42}, {x: 30, y: 35}, {x: 37, y: 30}, 
                 {x: 45, y: 30}
             ];
-
+            
+            // --- FINAL "PERFECT A" COORDINATES ---
             const initialsCoords = {
-                A1: [ {x: 30, y: 50}, {x: 28, y: 60}, {x: 25, y: 70}, {x: 32, y: 60}, {x: 35, y: 70}, {x: 27, y: 63}, {x: 33, y: 63} ],
+                // A1 is now made of 6 points
+                A1: [ 
+                    {x: 30, y: 50}, // Top
+                    {x: 27, y: 60}, // Upper Left
+                    {x: 24, y: 70}, // Lower Left
+                    {x: 33, y: 60}, // Upper Right
+                    {x: 36, y: 70}, // Lower Right
+                    {x: 30, y: 60}  // Single centered crossbar dot (Aligned)
+                ],
                 plus: [ {x: 50, y: 60}, {x: 47, y: 60}, {x: 53, y: 60}, {x: 50, y: 57}, {x: 50, y: 63} ],
-                A2: [ {x: 70, y: 50}, {x: 68, y: 60}, {x: 65, y: 70}, {x: 72, y: 60}, {x: 75, y: 70}, {x: 67, y: 63}, {x: 73, y: 63} ]
+                // A2 is the same shape as A1, just shifted to the right
+                A2: [ 
+                    {x: 70, y: 50}, // Top
+                    {x: 67, y: 60}, // Upper Left
+                    {x: 64, y: 70}, // Lower Left
+                    {x: 73, y: 60}, // Upper Right
+                    {x: 76, y: 70}, // Lower Right
+                    {x: 70, y: 60}  // Single centered crossbar dot (Aligned)
+                ]
             };
 
             const starsData = [
                 { id: 'star1', msg: "This one remembers your laugh.", img: "laugh.jpg", 
-                  initialPos: { x: 30, y: 40 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] },
+                  initialPos: { x: 30, y: 40 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] }, // Top of A1
                 { id: 'star2', msg: "This one remembers your touch.", img: "touch.jpg", 
-                  initialPos: { x: 50, y: 50 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[2] },
+                  initialPos: { x: 50, y: 50 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[2] }, // Bottom-left of A1
                 { id: 'star3', msg: "This one remembers our first date.", img: "date.jpg", 
-                  initialPos: { x: 70, y: 45 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] },
+                  initialPos: { x: 70, y: 45 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] }, // Center of Plus
                 { id: 'star4', msg: "This one remembers anniversary.", img: "anniversary.jpg", 
-                  initialPos: { x: 40, y: 65 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[0] },
+                  initialPos: { x: 40, y: 65 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[0] }, // Top of A2
                 { id: 'star5', msg: "This one holds all my secrets.", img: "secrets.jpg", 
-                  initialPos: { x: 60, y: 60 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[4] }
+                  initialPos: { x: 60, y: 60 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[4] }  // Bottom-right of A2
             ];
 
             starsData.forEach(data => {
@@ -244,8 +246,8 @@
                 starsData.forEach(data => {
                     const star = document.getElementById(data.id);
                     star.classList.add('final-look');
-                    star.style.left = `${data.heartPos.x}vw`;
-                    star.style.top = `${data.heartPos.y}vh`;
+                    star.style.left = `${data.heartPos.x}%`;
+                    star.style.top = `${data.heartPos.y}%`;
                 });
                 
                 setTimeout(() => {
@@ -256,8 +258,8 @@
 
                     starsData.forEach(data => {
                         const star = document.getElementById(data.id);
-                        star.style.left = `${data.initialsPos.x}vw`;
-                        star.style.top = `${data.initialsPos.y}vh`;
+                        star.style.left = `${data.initialsPos.x}%`;
+                        star.style.top = `${data.initialsPos.y}%`;
                     });
                 }, 4000);
 
@@ -270,8 +272,8 @@
                 coordinates.forEach(coord => {
                     const filler = document.createElement('div');
                     filler.className = 'filler-star';
-                    filler.style.left = `${coord.x}vw`;
-                    filler.style.top = `${coord.y}vh`;
+                    filler.style.left = `${coord.x}%`;
+                    filler.style.top = `${coord.y}%`;
                     fillerStarContainer.appendChild(filler);
                     setTimeout(() => filler.style.opacity = '1', 50);
                 });
@@ -280,3 +282,8 @@
     </script>
 </body>
 </html>
+
+
+
+
+
