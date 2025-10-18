@@ -95,16 +95,19 @@
             z-index: 5;
             transition: opacity 2s ease;
             text-align: center;
+            width: 90%;
         }
 
         #final-message {
             position: absolute;
             top: 15%; /* Fixed to the top */
             left: 50%;
+            width: 90%;
             transform: translateX(-50%);
             font-size: 2.5em;
             color: #fff;
             text-shadow: 0 0 10px #fff, 0 0 20px #ffc0cb;
+            text-align: center;
         }
 
         /* Modal Styles */
@@ -130,6 +133,25 @@
         #modal-caption { color: #333; font-size: 1.3em; margin-top: 15px; }
         .close-button { position: absolute; top: 10px; right: 15px; font-size: 2em; color: #555; cursor: pointer; }
         .hidden { opacity: 0; pointer-events: none; }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .star {
+                width: 8px;
+                height: 8px;
+            }
+            .filler-star, .star.final-look {
+                width: 4px;
+                height: 4px;
+            }
+            #intro-message {
+                font-size: 1.2em;
+            }
+            #final-message {
+                font-size: 1.8em;
+                top: 20%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -160,49 +182,57 @@
 
             let clickedStarCount = 0;
             const totalStars = 5;
+            const isMobile = window.innerWidth <= 768;
 
-            // Coordinates are in percentages {x, y}
-            const heartCoords = [
+            // --- COORDINATE DEFINITIONS ---
+            let heartCoords, initialsCoords;
+
+            // Desktop Coordinates
+            const desktopHeartCoords = [
                 {x: 50, y: 35}, {x: 55, y: 30}, {x: 63, y: 30}, {x: 70, y: 35}, {x: 75, y: 42}, 
                 {x: 75, y: 50}, {x: 70, y: 60}, {x: 60, y: 70}, {x: 50, y: 80}, {x: 40, y: 70}, 
                 {x: 30, y: 60}, {x: 25, y: 50}, {x: 25, y: 42}, {x: 30, y: 35}, {x: 37, y: 30}, 
                 {x: 45, y: 30}
             ];
-            
-            // --- FINAL "PERFECT A" COORDINATES ---
-            const initialsCoords = {
-                // A1 is now made of 6 points
-                A1: [ 
-                    {x: 30, y: 50}, // Top
-                    {x: 27, y: 60}, // Upper Left
-                    {x: 24, y: 70}, // Lower Left
-                    {x: 33, y: 60}, // Upper Right
-                    {x: 36, y: 70}, // Lower Right
-                    {x: 30, y: 60}  // Single centered crossbar dot (Aligned)
-                ],
+            const desktopInitialsCoords = {
+                A1: [ {x: 30, y: 50}, {x: 27, y: 60}, {x: 24, y: 70}, {x: 33, y: 60}, {x: 36, y: 70}, {x: 30, y: 60} ],
                 plus: [ {x: 50, y: 60}, {x: 47, y: 60}, {x: 53, y: 60}, {x: 50, y: 57}, {x: 50, y: 63} ],
-                // A2 is the same shape as A1, just shifted to the right
-                A2: [ 
-                    {x: 70, y: 50}, // Top
-                    {x: 67, y: 60}, // Upper Left
-                    {x: 64, y: 70}, // Lower Left
-                    {x: 73, y: 60}, // Upper Right
-                    {x: 76, y: 70}, // Lower Right
-                    {x: 70, y: 60}  // Single centered crossbar dot (Aligned)
-                ]
+                A2: [ {x: 70, y: 50}, {x: 67, y: 60}, {x: 64, y: 70}, {x: 73, y: 60}, {x: 76, y: 70}, {x: 70, y: 60} ]
             };
+
+            // Mobile Coordinates (more compact and centered)
+            const mobileHeartCoords = [
+                {x: 50, y: 35}, {x: 60, y: 30}, {x: 70, y: 30}, {x: 80, y: 35}, {x: 85, y: 45},
+                {x: 80, y: 55}, {x: 70, y: 65}, {x: 50, y: 75}, {x: 30, y: 65}, {x: 20, y: 55},
+                {x: 15, y: 45}, {x: 20, y: 35}, {x: 30, y: 30}, {x: 40, y: 30}
+            ];
+            const mobileInitialsCoords = {
+                A1: [ {x: 35, y: 45}, {x: 30, y: 55}, {x: 25, y: 65}, {x: 40, y: 55}, {x: 45, y: 65}, {x: 35, y: 55} ],
+                plus: [ {x: 50, y: 55} ],
+                A2: [ {x: 65, y: 45}, {x: 60, y: 55}, {x: 55, y: 65}, {x: 70, y: 55}, {x: 75, y: 65}, {x: 65, y: 55} ]
+            };
+
+            // Choose the correct set of coordinates based on screen size
+            if (isMobile) {
+                heartCoords = mobileHeartCoords;
+                initialsCoords = mobileInitialsCoords;
+            } else {
+                heartCoords = desktopHeartCoords;
+                initialsCoords = desktopInitialsCoords;
+            }
+
 
             const starsData = [
                 { id: 'star1', msg: "This one remembers your laugh.", img: "laugh.jpg", 
-                  initialPos: { x: 30, y: 40 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] }, // Top of A1
+                  initialPos: { x: 30, y: 40 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] },
                 { id: 'star2', msg: "This one remembers your touch.", img: "touch.jpg", 
-                  initialPos: { x: 50, y: 50 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[2] }, // Bottom-left of A1
+                  initialPos: { x: 50, y: 50 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[2] },
                 { id: 'star3', msg: "This one remembers our first date.", img: "date.jpg", 
-                  initialPos: { x: 70, y: 45 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] }, // Center of Plus
+                  initialPos: { x: 70, y: 45 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] },
                 { id: 'star4', msg: "This one remembers anniversary.", img: "anniversary.jpg", 
-                  initialPos: { x: 40, y: 65 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[0] }, // Top of A2
+                  initialPos: { x: 40, y: 65 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[0] },
                 { id: 'star5', msg: "This one holds all my secrets.", img: "secrets.jpg", 
-                  initialPos: { x: 60, y: 60 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[4] }  // Bottom-right of A2
+                  initialPos: { x: 60, y: 60 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[4] }
             ];
 
             starsData.forEach(data => {
@@ -253,7 +283,7 @@
                 setTimeout(() => {
                     fillerStarContainer.innerHTML = '';
                     createFillerStars(initialsCoords.A1);
-                    createFillerStars(initialsCoords.plus);
+                    if (!isMobile) createFillerStars(initialsCoords.plus); // Plus sign only on desktop
                     createFillerStars(initialsCoords.A2);
 
                     starsData.forEach(data => {
@@ -282,8 +312,4 @@
     </script>
 </body>
 </html>
-
-
-
-
 
