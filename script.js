@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const starContainer = document.getElementById('universe-container');
+    const fillerStarContainer = document.getElementById('filler-stars-container');
     const modal = document.getElementById('modal');
     const modalImage = document.getElementById('modal-image');
     const modalCaption = document.getElementById('modal-caption');
@@ -12,99 +13,109 @@ document.addEventListener('DOMContentLoaded', () => {
     let clickedStarCount = 0;
     const totalStars = 5;
 
-    // Define the 5 main stars with their data and final positions
-    // Positions are in {x, y} percentages for the screen
-    const starsData = [
-        // A + A initials (left A)
-        { id: 'star1', message: "This one remembers your laugh.", image: "laugh.jpg", heartPos: { x: 50, y: 80 }, initialsPos: { x: 25, y: 70 } },
-        { id: 'star2', message: "This one remembers your touch.", image: "touch.jpg", heartPos: { x: 30, y: 50 }, initialsPos: { x: 35, y: 70 } },
-        { id: 'star3', message: "This one remembers our first date.", image: "date.jpg", heartPos: { x: 50, y: 35 }, initialsPos: { x: 30, y: 50 } },
-        // A + A initials (right A)
-        { id: 'star4', message: "This one remembers anniversary.", image: "anniversary.jpg", heartPos: { x: 70, y: 50 }, initialsPos: { x: 65, y: 70 } },
-        { id: 'star5', message: "This one holds all my secrets.", image: "secrets.jpg", heartPos: { x: 50, y: 55 }, initialsPos: { x: 75, y: 70 } },
+    // --- NEW COORDINATES FOR SHAPES (percentages: {x, y}) ---
+    const heartCoords = [
+        {x: 50, y: 35}, {x: 55, y: 30}, {x: 63, y: 30}, {x: 70, y: 35}, {x: 75, y: 42}, 
+        {x: 75, y: 50}, {x: 70, y: 60}, {x: 60, y: 70}, {x: 50, y: 80}, {x: 40, y: 70}, 
+        {x: 30, y: 60}, {x: 25, y: 50}, {x: 25, y: 42}, {x: 30, y: 35}, {x: 37, y: 30}, 
+        {x: 45, y: 30}
     ];
 
-    // Create and place the 5 main stars randomly
-    starsData.forEach(starData => {
+    const initialsCoords = {
+        A1: [ {x: 25, y: 70}, {x: 30, y: 50}, {x: 35, y: 70}, {x: 28, y: 60}, {x: 32, y: 60} ],
+        plus: [ {x: 50, y: 60}, {x: 47, y: 60}, {x: 53, y: 60}, {x: 50, y: 57}, {x: 50, y: 63} ],
+        A2: [ {x: 65, y: 70}, {x: 70, y: 50}, {x: 75, y: 70}, {x: 68, y: 60}, {x: 72, y: 60} ]
+    };
+
+    // Data for the 5 INTERACTIVE stars with new initial positions
+    const starsData = [
+        { id: 'star1', msg: "This one remembers your laugh.", img: "laugh.jpg", 
+          initialPos: { x: 20, y: 80 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] },
+        { id: 'star2', msg: "This one remembers your touch.", img: "touch.jpg", 
+          initialPos: { x: 35, y: 85 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[1] },
+        { id: 'star3', msg: "This one remembers our first date.", img: "date.jpg", 
+          initialPos: { x: 50, y: 88 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] },
+        { id: 'star4', msg: "This one remembers anniversary.", img: "anniversary.jpg", 
+          initialPos: { x: 65, y: 85 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[1] },
+        { id: 'star5', msg: "This one holds all my secrets.", img: "secrets.jpg", 
+          initialPos: { x: 80, y: 80 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[2] }
+    ];
+
+    // Create and place the 5 main stars
+    starsData.forEach(data => {
         const star = document.createElement('div');
         star.className = 'star';
-        star.id = starData.id;
-        // Place stars more centrally to avoid edges
-        star.style.left = `${Math.random() * 70 + 15}%`; 
-        star.style.top = `${Math.random() * 60 + 20}%`; 
-        
-        star.addEventListener('click', () => onStarClick(star, starData));
+        star.id = data.id;
+        star.style.left = `${data.initialPos.x}%`; 
+        star.style.top = `${data.initialPos.y}%`; 
+        star.addEventListener('click', () => onStarClick(star, data));
         starContainer.appendChild(star);
     });
 
-    // Function to handle clicking a star
-    function onStarClick(starElement, starData) {
-        // This 'if' statement prevents already clicked stars from doing anything
-        if (starElement.classList.contains('clicked')) {
-            return; 
-        }
-
+    function onStarClick(starElement, data) {
+        if (starElement.classList.contains('clicked')) return;
         starElement.classList.add('clicked');
         clickedStarCount++;
         
-        // Show the modal with the correct image and message
-        modalImage.src = starData.image;
-        modalCaption.innerText = starData.message;
+        modalImage.src = data.img;
+        modalCaption.innerText = data.msg;
         modal.classList.add('visible');
 
-        // Check if all stars have been clicked
         if (clickedStarCount === totalStars) {
-            // Hide the modal after a short delay and then start the final animation
             setTimeout(runFinalAnimation, 2000); 
         }
     }
 
-    // Function to close the modal
     function closeModal() {
         modal.classList.remove('visible');
     }
-
-    // Event listeners to close the modal
     closeButton.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {
-        // Closes if you click on the dark background, but not on the content
-        if (e.target.id === 'modal') {
-            closeModal();
-        }
-    });
+    modal.addEventListener('click', (e) => e.target.id === 'modal' && closeModal());
 
-    // The Final Animation Sequence
     function runFinalAnimation() {
         closeModal();
         introMessage.classList.add('hidden');
-
-        // 1. Animate stars to HEART shape
-        starsData.forEach(starData => {
-            const star = document.getElementById(starData.id);
-            const newX = starData.heartPos.x;
-            const newY = starData.heartPos.y;
-            star.style.left = `${newX}vw`;
-            star.style.top = `${newY}vh`;
-            star.style.transform = `translate(-50%, -50%) scale(1.5)`; // Make them bigger
-        });
-        
-        // Play music on loop
         finalMusic.play();
 
-        // 2. After a delay, animate from HEART to A + A
-        setTimeout(() => {
-            starsData.forEach(starData => {
-                const star = document.getElementById(starData.id);
-                const newX = starData.initialsPos.x;
-                const newY = starData.initialsPos.y;
-                star.style.left = `${newX}vw`;
-                star.style.top = `${newY}vh`;
-            });
-        }, 4000); // Wait 4 seconds
+        // 1. Animate to HEART shape
+        starsData.forEach(data => {
+            const star = document.getElementById(data.id);
+            star.style.left = `${data.heartPos.x}vw`;
+            star.style.top = `${data.heartPos.y}vh`;
+            star.style.transform = `translate(-50%, -50%) scale(1.3)`;
+        });
+        createFillerStars(heartCoords);
 
-        // 3. After another delay, show the final message
+        // 2. Animate to INITIALS shape
+        setTimeout(() => {
+            fillerStarContainer.innerHTML = ''; 
+            
+            starsData.forEach(data => {
+                const star = document.getElementById(data.id);
+                star.style.left = `${data.initialsPos.x}vw`;
+                star.style.top = `${data.initialsPos.y}vh`;
+            });
+
+            createFillerStars(initialsCoords.A1);
+            createFillerStars(initialsCoords.plus);
+            createFillerStars(initialsCoords.A2);
+
+        }, 4000);
+
+        // 3. Show final message
         setTimeout(() => {
             finalMessage.classList.remove('hidden');
-        }, 7000); // Wait 7 seconds total
+        }, 7000);
+    }
+
+    function createFillerStars(coordinates) {
+        coordinates.forEach(coord => {
+            const filler = document.createElement('div');
+            filler.className = 'filler-star';
+            filler.style.left = `${coord.x}vw`;
+            filler.style.top = `${coord.y}vh`;
+            fillerStarContainer.appendChild(filler);
+            setTimeout(() => filler.style.opacity = '0.7', 100);
+        });
     }
 });
