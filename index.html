@@ -4,23 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secret Universe</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* General Setup */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cursive', 'Palatino', serif;
+            background-color: #000;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* Animated CSS Galaxy Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: 
+                radial-gradient(ellipse at center, rgba(30, 45, 60, 0.8) 0%, rgba(9, 10, 15, 0.9) 70%, #000 100%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><style type="text/css"><![CDATA[circle{fill:white;animation:sparkle 2s linear infinite alternate;}@keyframes sparkle{0%{opacity:0;}100%{opacity:0.3;}}]]></style></defs><circle cx="10" cy="10" r="0.5"/><circle cx="50" cy="30" r="0.5"/><circle cx="80" cy="70" r="0.5"/><circle cx="30" cy="90" r="0.5"/><circle cx="90" cy="20" r="0.5"/></svg>');
+            animation: move-galaxy 60s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes move-galaxy {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+
+        #universe-container, #filler-stars-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none; 
+        }
+        #universe-container {
+            pointer-events: auto; 
+        }
+
+        /* Main Interactive Star Styling */
+        .star {
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #00aaff, 0 0 40px #00aaff;
+            animation: twinkle 2s infinite alternate ease-in-out;
+            transition: transform 2.5s ease-in-out, opacity 1s ease, box-shadow 0.3s ease, left 2.5s ease-in-out, top 2.5s ease-in-out,
+                        width 0.3s ease, height 0.3s ease;
+            z-index: 10;
+        }
+
+        /* Filler Star Styling */
+        .filler-star {
+            width: 6px;
+            height: 6px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 5px #fff, 0 0 10px #00aaff;
+            transition: opacity 0.2s ease;
+            z-index: 5;
+            opacity: 0; /* Starts invisible */
+        }
+        
+        /* This class makes the main stars match the filler stars */
+        .star.final-look {
+            width: 6px;
+            height: 6px;
+            box-shadow: 0 0 5px #fff, 0 0 10px #00aaff;
+            animation: none;
+            transform: scale(1);
+        }
+
+        .star:hover {
+            box-shadow: 0 0 7px #fff, 0 0 15px #fff, 0 0 25px #fff, 0 0 40px #ff00ff, 0 0 55px #ff00ff;
+        }
+
+        .star.clicked {
+            opacity: 0.4;
+            cursor: default;
+            animation-play-state: paused;
+            pointer-events: none;
+        }
+
+        @keyframes twinkle {
+            from { transform: scale(1); }
+            to { transform: scale(1.4); }
+        }
+
+        /* Text Styling */
+        #intro-message {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px #000;
+            z-index: 5;
+            transition: opacity 2s ease;
+            text-align: center;
+        }
+
+        #final-message {
+            position: absolute;
+            top: 15%; /* Fixed to the top */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5em;
+            color: #fff;
+            text-shadow: 0 0 10px #fff, 0 0 20px #ffc0cb;
+        }
+
+        /* Modal Styles */
+        #modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #modal-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 25px; border-radius: 10px; text-align: center;
+            max-width: 90%; max-height: 90%;
+            box-shadow: 0 0 40px rgba(255, 192, 203, 0.7);
+            position: relative; transform: scale(0.7);
+            transition: transform 0.5s ease;
+        }
+        #modal.visible { opacity: 1; pointer-events: all; }
+        #modal.visible #modal-content { transform: scale(1); }
+        #modal-image { max-width: 100%; max-height: 70vh; border-radius: 5px; }
+        #modal-caption { color: #333; font-size: 1.3em; margin-top: 15px; }
+        .close-button { position: absolute; top: 10px; right: 15px; font-size: 2em; color: #555; cursor: pointer; }
+        .hidden { opacity: 0; pointer-events: none; }
+    </style>
 </head>
 <body>
-    <div id="universe-container">
-        </div>
-    
-    <div id="filler-stars-container">
-        </div>
-
-    <div id="intro-message">
-        Every star has a story. Click one to see.
-    </div>
-
-    <div id="final-message" class="hidden">
-        Every star I’ve ever wished on led to you.
-    </div>
-
+    <div id="universe-container"></div>
+    <div id="filler-stars-container"></div>
+    <div id="intro-message">Every star has a story. Click one to see.</div>
+    <div id="final-message" class="hidden">Every star I’ve ever wished on led to you.</div>
     <div id="modal" class="hidden">
         <div id="modal-content">
             <span class="close-button">&times;</span>
@@ -28,9 +160,123 @@
             <p id="modal-caption"></p>
         </div>
     </div>
-
     <audio id="final-music" src="music.mp3" preload="auto" loop></audio>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const starContainer = document.getElementById('universe-container');
+            const fillerStarContainer = document.getElementById('filler-stars-container');
+            const modal = document.getElementById('modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalCaption = document.getElementById('modal-caption');
+            const closeButton = document.querySelector('.close-button');
+            const introMessage = document.getElementById('intro-message');
+            const finalMessage = document.getElementById('final-message');
+            const finalMusic = document.getElementById('final-music');
+
+            let clickedStarCount = 0;
+            const totalStars = 5;
+
+            const heartCoords = [
+                {x: 50, y: 35}, {x: 55, y: 30}, {x: 63, y: 30}, {x: 70, y: 35}, {x: 75, y: 42}, 
+                {x: 75, y: 50}, {x: 70, y: 60}, {x: 60, y: 70}, {x: 50, y: 80}, {x: 40, y: 70}, 
+                {x: 30, y: 60}, {x: 25, y: 50}, {x: 25, y: 42}, {x: 30, y: 35}, {x: 37, y: 30}, 
+                {x: 45, y: 30}
+            ];
+
+            const initialsCoords = {
+                A1: [ {x: 30, y: 50}, {x: 28, y: 60}, {x: 25, y: 70}, {x: 32, y: 60}, {x: 35, y: 70}, {x: 27, y: 63}, {x: 33, y: 63} ],
+                plus: [ {x: 50, y: 60}, {x: 47, y: 60}, {x: 53, y: 60}, {x: 50, y: 57}, {x: 50, y: 63} ],
+                A2: [ {x: 70, y: 50}, {x: 68, y: 60}, {x: 65, y: 70}, {x: 72, y: 60}, {x: 75, y: 70}, {x: 67, y: 63}, {x: 73, y: 63} ]
+            };
+
+            const starsData = [
+                { id: 'star1', msg: "This one remembers your laugh.", img: "laugh.jpg", 
+                  initialPos: { x: 30, y: 40 }, heartPos: heartCoords[8], initialsPos: initialsCoords.A1[0] },
+                { id: 'star2', msg: "This one remembers your touch.", img: "touch.jpg", 
+                  initialPos: { x: 50, y: 50 }, heartPos: heartCoords[11], initialsPos: initialsCoords.A1[2] },
+                { id: 'star3', msg: "This one remembers our first date.", img: "date.jpg", 
+                  initialPos: { x: 70, y: 45 }, heartPos: heartCoords[0], initialsPos: initialsCoords.plus[0] },
+                { id: 'star4', msg: "This one remembers anniversary.", img: "anniversary.jpg", 
+                  initialPos: { x: 40, y: 65 }, heartPos: heartCoords[3], initialsPos: initialsCoords.A2[0] },
+                { id: 'star5', msg: "This one holds all my secrets.", img: "secrets.jpg", 
+                  initialPos: { x: 60, y: 60 }, heartPos: heartCoords[6], initialsPos: initialsCoords.A2[4] }
+            ];
+
+            starsData.forEach(data => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.id = data.id;
+                star.style.left = `${data.initialPos.x}%`; 
+                star.style.top = `${data.initialPos.y}%`; 
+                star.addEventListener('click', () => onStarClick(star, data));
+                starContainer.appendChild(star);
+            });
+
+            function onStarClick(starElement, data) {
+                if (starElement.classList.contains('clicked')) return;
+                starElement.classList.add('clicked');
+                clickedStarCount++;
+                
+                modalImage.src = data.img;
+                modalCaption.innerText = data.msg;
+                modal.classList.add('visible');
+
+                if (clickedStarCount === totalStars) {
+                    setTimeout(runFinalAnimation, 2000); 
+                }
+            }
+
+            function closeModal() {
+                modal.classList.remove('visible');
+            }
+            closeButton.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => e.target.id === 'modal' && closeModal());
+
+            function runFinalAnimation() {
+                closeModal();
+                introMessage.classList.add('hidden');
+                finalMusic.play();
+
+                fillerStarContainer.innerHTML = '';
+                createFillerStars(heartCoords);
+
+                starsData.forEach(data => {
+                    const star = document.getElementById(data.id);
+                    star.classList.add('final-look');
+                    star.style.left = `${data.heartPos.x}vw`;
+                    star.style.top = `${data.heartPos.y}vh`;
+                });
+                
+                setTimeout(() => {
+                    fillerStarContainer.innerHTML = '';
+                    createFillerStars(initialsCoords.A1);
+                    createFillerStars(initialsCoords.plus);
+                    createFillerStars(initialsCoords.A2);
+
+                    starsData.forEach(data => {
+                        const star = document.getElementById(data.id);
+                        star.style.left = `${data.initialsPos.x}vw`;
+                        star.style.top = `${data.initialsPos.y}vh`;
+                    });
+                }, 4000);
+
+                setTimeout(() => {
+                    finalMessage.classList.remove('hidden');
+                }, 7000);
+            }
+
+            function createFillerStars(coordinates) {
+                coordinates.forEach(coord => {
+                    const filler = document.createElement('div');
+                    filler.className = 'filler-star';
+                    filler.style.left = `${coord.x}vw`;
+                    filler.style.top = `${coord.y}vh`;
+                    fillerStarContainer.appendChild(filler);
+                    setTimeout(() => filler.style.opacity = '1', 50);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
