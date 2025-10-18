@@ -4,25 +4,13 @@ html, body {
     margin: 0;
     padding: 0;
     font-family: 'Cursive', 'Palatino', serif;
-    background-color: #000; /* Fallback for video */
+    /* New CSS Galaxy Background */
+    background: radial-gradient(ellipse at center, #1b2735 0%, #090a0f 100%);
     overflow: hidden;
     color: white;
 }
 
-/* Video Background Styling */
-#background-video {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100; /* Pushed far back */
-    transform: translateX(-50%) translateY(-50%);
-    object-fit: cover;
-    opacity: 0.6;
-}
+/* Removed the #background-video styles */
 
 #universe-container, #filler-stars-container {
     width: 100%;
@@ -30,10 +18,10 @@ html, body {
     position: absolute;
     top: 0;
     left: 0;
-    pointer-events: none; /* Allows clicks to go "through" to stars */
+    pointer-events: none; 
 }
 #universe-container {
-    pointer-events: auto; /* Re-enables clicks for the main star container */
+    pointer-events: auto; 
 }
 
 /* Main Interactive Star Styling */
@@ -46,11 +34,12 @@ html, body {
     cursor: pointer;
     box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #00aaff, 0 0 40px #00aaff;
     animation: twinkle 2s infinite alternate ease-in-out;
-    transition: transform 2.5s ease-in-out, opacity 1s ease, box-shadow 0.3s ease, left 2.5s ease-in-out, top 2.5s ease-in-out;
+    transition: transform 2.5s ease-in-out, opacity 1s ease, box-shadow 0.3s ease, left 2.5s ease-in-out, top 2.5s ease-in-out,
+                width 0.3s ease, height 0.3s ease; /* Added width/height transition */
     z-index: 10;
 }
 
-/* Filler Star Styling (smaller and subtler) */
+/* Filler Star Styling */
 .filler-star {
     width: 6px;
     height: 6px;
@@ -58,9 +47,18 @@ html, body {
     border-radius: 50%;
     position: absolute;
     box-shadow: 0 0 5px #fff, 0 0 10px #00aaff;
-    transition: opacity 1s ease;
+    transition: opacity 0.2s ease; /* Fades in fast */
     z-index: 5;
     opacity: 0; /* Starts invisible */
+}
+
+/* This new class makes the main stars match the filler stars */
+.star.final-look {
+    width: 6px;
+    height: 6px;
+    box-shadow: 0 0 5px #fff, 0 0 10px #00aaff;
+    animation: none; /* Stop twinkling */
+    transform: scale(1); /* Reset any scaling */
 }
 
 .star:hover {
@@ -82,7 +80,7 @@ html, body {
 /* Text Styling */
 #intro-message {
     position: absolute;
-    top: 25%; /* Moved down slightly */
+    top: 25%;
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.5em;
