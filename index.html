@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secret Universe</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* General Setup */
         html, body {
@@ -16,6 +18,13 @@
             background-image: radial-gradient(ellipse at center, #1b2735 0%, #090a0f 100%);
             overflow: hidden;
             color: white;
+        }
+
+        /* --- Main Content (Hidden by default) --- */
+        #main-content {
+            visibility: hidden;
+            width: 100%;
+            height: 100%;
         }
 
         #universe-container, #filler-stars-container {
@@ -152,24 +161,179 @@
                 top: 20%;
             }
         }
+        
+        /* --- NEW Password Lock Styles (Dark Theme) --- */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.65); /* 65% black background */
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200; /* Must be on top of everything */
+            transition: opacity 0.3s ease-out;
+        }
+
+        #lock-box {
+            background-color: #1f1f1f; /* Dark box */
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 90%; /* Responsive width */
+            max-width: 320px; /* Max width matching black example */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        #lock-gif {
+            width: 150px;
+            height: 150px;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #password-input {
+            font-family: 'Orbitron', sans-serif;
+            width: 100%; /* Full width */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid #374151; /* Grey border */
+            background-color: #121212; /* Dark bg */
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+            letter-spacing: 2px;
+            box-sizing: border-box; 
+        }
+
+        #password-input:focus {
+            outline: none;
+            border-color: #3b82f6; /* Blue border on focus */
+        }
+
+        #submit-button {
+            font-family: 'Orbitron', sans-serif;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            font-weight: 700;
+            margin-top: 1rem;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer; 
+            box-sizing: border-box; 
+        }
+
+        #submit-button:hover {
+            background-color: #2563eb;
+        }
+
+        #error-message {
+            color: #ef4444; /* Red */
+            font-size: 0.9rem;
+            height: 1.25rem; /* Reserve space */
+            margin-top: 0.75rem;
+        }
+
+        /* Shake animation for wrong password */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        /* --- End Password Lock Styles --- */
     </style>
 </head>
 <body>
-    <div id="universe-container"></div>
-    <div id="filler-stars-container"></div>
-    <div id="intro-message">Every star has a story. Click one to see.</div>
-    <div id="final-message" class="hidden">Every star I’ve ever wished on led to you.</div>
-    <div id="modal" class="hidden">
-        <div id="modal-content">
-            <span class="close-button">&times;</span>
-            <img id="modal-image" src="" alt="Memory">
-            <p id="modal-caption"></p>
-        </div>
+
+    <!-- --- NEW Password Overlay --- -->
+    <div id="password-overlay">
+        <form id="lock-box">
+            <img id="lock-gif" src="dudu-no-dudu.gif" alt="Dudu Bubu No">
+            <input id="password-input" type="password" placeholder="Enter Password">
+            <p id="error-message"></p>
+            <button id="submit-button" type="submit">Unlock</button>
+        </form>
     </div>
-    <audio id="final-music" src="music.mp3" preload="auto" loop></audio>
+
+    <!-- --- Main Content Wrapper --- -->
+    <div id="main-content">
+        <div id="universe-container"></div>
+        <div id="filler-stars-container"></div>
+        <div id="intro-message">Every star has a story. Click one to see.</div>
+        <div id="final-message" class="hidden">Every star I’ve ever wished on led to you.</div>
+        <div id="modal" class="hidden">
+            <div id="modal-content">
+                <span class="close-button">&times;</span>
+                <img id="modal-image" src="" alt="Memory">
+                <p id="modal-caption"></p>
+            </div>
+        </div>
+        <audio id="final-music" src="music.mp3" preload="auto" loop></audio>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            // --- NEW Password Lock Script ---
+            const passwordOverlay = document.getElementById('password-overlay');
+            const lockBox = document.getElementById('lock-box');
+            const passwordInput = document.getElementById('password-input');
+            const errorMessage = document.getElementById('error-message');
+            const mainContent = document.getElementById('main-content');
+            const correctPassword = "28072018";
+
+            // Check if already unlocked in this session
+            if (sessionStorage.getItem('isUnlocked') === 'true') {
+                passwordOverlay.style.display = 'none';
+                mainContent.style.visibility = 'visible';
+            }
+
+            lockBox.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const enteredPassword = passwordInput.value;
+
+                if (enteredPassword === correctPassword) {
+                    // Correct password
+                    sessionStorage.setItem('isUnlocked', 'true');
+                    passwordOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        passwordOverlay.style.display = 'none';
+                    }, 300); // Wait for fade out
+                    mainContent.style.visibility = 'visible'; // Show the game
+                } else {
+                    // Wrong password
+                    errorMessage.textContent = 'Wrong Password. Try Again!';
+                    lockBox.classList.add('shake');
+                    passwordInput.value = '';
+
+                    // Remove shake animation so it can be re-added
+                    setTimeout(() => {
+                        lockBox.classList.remove('shake');
+                        errorMessage.textContent = ''; // Clear error message
+                    }, 1000);
+                }
+            });
+            // --- End Password Lock Script ---
+
+
+            // --- Original Star Game Script ---
             const starContainer = document.getElementById('universe-container');
             const fillerStarContainer = document.getElementById('filler-stars-container');
             const modal = document.getElementById('modal');
@@ -268,7 +432,7 @@
             function runFinalAnimation() {
                 closeModal();
                 introMessage.classList.add('hidden');
-                finalMusic.play();
+                finalMusic.play().catch(e => console.log("Audio play prevented by browser")); // Added catch
 
                 fillerStarContainer.innerHTML = '';
                 createFillerStars(heartCoords);
